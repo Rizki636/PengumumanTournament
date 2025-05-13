@@ -15,12 +15,17 @@
     fetch("data.json")
       .then(res => res.json())
       .then(data => {
-        const peserta = data.lolos.map(n => n.toLowerCase());
-        if (peserta.includes(nama.toLowerCase())) {
-          window.location.href = `prank.html?nama=${encodeURIComponent(nama)}`;
+        const namaLower = nama.toLowerCase();
+        const lolos = data.lolos.map(n => n.toLowerCase());
+        const tidakLolos = data.tidak_lolos.map(n => n.toLowerCase());
+
+        if (lolos.includes(namaLower)) {
+          window.location.href = `prank.html?nama=${encodeURIComponent(nama)}&status=lolos`;
+        } else if (tidakLolos.includes(namaLower)) {
+          window.location.href = `prank.html?nama=${encodeURIComponent(nama)}&status=tidak_lolos`;
         } else {
           document.getElementById("loading").style.display = "none";
-          document.getElementById("content").innerHTML = `<h2 style="color:red;">Maaf ${nama}, kamu <strong>Tidak Lolos</strong>.</h2>`;
+          document.getElementById("content").innerHTML = `<h2 style="color:orange;">Peserta dengan nama <strong>${nama}</strong> tidak ditemukan.</h2>`;
         }
       });
   </script>
