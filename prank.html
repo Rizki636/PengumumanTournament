@@ -1,173 +1,173 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Pengumuman Turnamen</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background: #f0f0f0;
-      overflow-x: hidden;
-    }
+  <meta charset="UTF-8">
+  <title>Pengumuman Turnamen</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background: #f0f0f0;
+      overflow-x: hidden;
+    }
 
-    h1 {
-      opacity: 0;
-      transform: translateX(-50px);
-      transition: all 0.8s ease;
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
+    h1 {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
 
-    .show {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    .show {
+      opacity: 1;
+      transform: translateX(0);
+    }
 
-    .desc {
-      font-size: 24px;
-      margin-bottom: 10px;
-      height: 30px;
-      white-space: pre-wrap;
-    }
+    .desc {
+      font-size: 24px;
+      margin-bottom: 10px;
+      height: 30px;
+      white-space: pre-wrap;
+    }
 
-    .loading {
-      font-size: 20px;
-      color: #555;
-      margin-bottom: 20px;
-      opacity: 0;
-      transform: translateX(-50px);
-      transition: all 0.8s ease;
-    }
+    .loading {
+      font-size: 20px;
+      color: #555;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+    }
 
-    .loading.show {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    .loading.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
 
-    .status, .final-result {
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.5s ease;
-    }
+    .status, .final-result {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.5s ease;
+    }
 
-    .scale-in {
-      opacity: 1;
-      transform: scale(1);
-    }
+    .scale-in {
+      opacity: 1;
+      transform: scale(1);
+    }
 
-    .status {
-      font-size: 36px;
-      color: red;
-    }
+    .status {
+      font-size: 36px;
+      color: red;
+    }
 
-    .strikethrough {
-      text-decoration: line-through;
-      opacity: 0.6;
-    }
+    .strikethrough {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
 
-    .final-result {
-      font-size: 48px;
-      color: green;
-      margin-top: 20px;
-    }
-  </style>
+    .final-result {
+      font-size: 48px;
+      color: green;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
 
-  <h1 id="nama">Halo, Peserta!</h1>
-  <div class="desc" id="desc"></div>
-  <div class="loading" id="loading">Memproses<span id="dots">.</span></div>
-  <div class="status" id="status">Tidak Lolos</div>
-  <div class="final-result" id="result">LOLOS 🎉</div>
+  <h1 id="nama">Halo, Peserta!</h1>
+  <div class="desc" id="desc"></div>
+  <div class="loading" id="loading">Memproses<span id="dots">.</span></div>
+  <div class="status" id="status">Tidak Lolos</div>
+  <div class="final-result" id="result">LOLOS 🎉</div>
 
-  <!-- Confetti Library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const namaPeserta = params.get("nama") || "Peserta";
-    const statusPeserta = params.get("status"); // 'lolos' atau 'tidak_lolos'
-    document.getElementById("nama").textContent = `Halo, ${namaPeserta}!`;
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const namaPeserta = params.get("nama") || "Peserta";
+    const statusPeserta = params.get("status"); // 'lolos' atau 'tidak_lolos'
+    document.getElementById("nama").textContent = `Halo, ${namaPeserta}!`;
 
-    const desc = document.getElementById("desc");
-    const loading = document.getElementById("loading");
-    const status = document.getElementById("status");
-    const result = document.getElementById("result");
-    const dotsEl = document.getElementById("dots");
+    const desc = document.getElementById("desc");
+    const loading = document.getElementById("loading");
+    const status = document.getElementById("status");
+    const result = document.getElementById("result");
+    const dotsEl = document.getElementById("dots");
 
-    const kalimat = "Berdasarkan hasil seleksi, Anda dinyatakan:";
-    let dotCount = 1;
-    let loadingInterval;
+    const kalimat = "Berdasarkan hasil seleksi, Anda dinyatakan:";
+    let dotCount = 1;
+    let loadingInterval;
 
-    function showConfetti() {
-      const duration = 2 * 1000;
-      const end = Date.now() + duration;
+    function showConfetti() {
+      const duration = 2 * 1000;
+      const end = Date.now() + duration;
 
-      (function frame() {
-        confetti({
-          particleCount: 5,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 }
-        });
-        confetti({
-          particleCount: 5,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 }
-        });
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
 
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      })();
-    }
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
 
-    // Tampilkan nama
-    setTimeout(() => {
-      document.getElementById("nama").classList.add("show");
-    }, 500);
+    // Tampilkan nama
+    setTimeout(() => {
+      document.getElementById("nama").classList.add("show");
+    }, 500);
 
-    // Efek ketik deskripsi
-    setTimeout(() => {
-      let i = 0;
-      const interval = setInterval(() => {
-        desc.textContent += kalimat[i];
-        i++;
-        if (i >= kalimat.length) {
-          clearInterval(interval);
+    // Efek ketik deskripsi
+    setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        desc.textContent += kalimat[i];
+        i++;
+        if (i >= kalimat.length) {
+          clearInterval(interval);
 
-          // Setelah selesai mengetik, tunggu 0.5s lalu tampilkan loading
-          setTimeout(() => {
-            loading.classList.add("show");
-            loadingInterval = setInterval(() => {
-              dotCount = (dotCount % 3) + 1;
-              dotsEl.textContent = ".".repeat(dotCount);
-            }, 500);
+          // Setelah selesai mengetik, tunggu 0.5s lalu tampilkan loading
+          setTimeout(() => {
+            loading.classList.add("show");
+            loadingInterval = setInterval(() => {
+              dotCount = (dotCount % 3) + 1;
+              dotsEl.textContent = ".".repeat(dotCount);
+            }, 500);
 
-            // Setelah 4 detik loading
-            setTimeout(() => {
-              clearInterval(loadingInterval);
-              loading.style.display = "none";
-              status.classList.add("scale-in");
+            // Setelah 4 detik loading
+            setTimeout(() => {
+              clearInterval(loadingInterval);
+              loading.style.display = "none";
+              status.classList.add("scale-in");
 
-              if (statusPeserta === "lolos") {
-                // Tampilkan LOLOS setelah 1.5 detik dengan confetti
-                setTimeout(() => {
-                  status.classList.add("strikethrough");
-                  result.classList.add("scale-in");
-                  showConfetti();
-                }, 1500);
-              }
+              if (statusPeserta === "lolos") {
+                // Tampilkan LOLOS setelah 1.5 detik dengan confetti
+                setTimeout(() => {
+                  status.classList.add("strikethrough");
+                  result.classList.add("scale-in");
+                  showConfetti();
+                }, 1500);
+              }
 
-            }, 4000);
-          }, 500);
-        }
-      }, 50);
-    }, 500);
-  </script>
+            }, 4000);
+          }, 500);
+        }
+      }, 50);
+    }, 500);
+  </script>
 
 </body>
 </html>
