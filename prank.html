@@ -59,6 +59,7 @@
 
     .status {
       font-size: 36px;
+      color: red;
     }
 
     .strikethrough {
@@ -78,7 +79,7 @@
   <h1 id="nama">Halo, Peserta!</h1>
   <div class="desc" id="desc"></div>
   <div class="loading" id="loading">Memproses<span id="dots">.</span></div>
-  <div class="status" id="status"></div>
+  <div class="status" id="status">Tidak Lolos</div>
   <div class="final-result" id="result">LOLOS 🎉</div>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -103,18 +104,8 @@
       const end = Date.now() + duration;
 
       (function frame() {
-        confetti({
-          particleCount: 5,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 }
-        });
-        confetti({
-          particleCount: 5,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 }
-        });
+        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
 
         if (Date.now() < end) {
           requestAnimationFrame(frame);
@@ -122,12 +113,6 @@
       })();
     }
 
-    // Animasi nama peserta
-    setTimeout(() => {
-      document.getElementById("nama").classList.add("show");
-    }, 500);
-
-    // Ambil dan validasi dari data.json
     fetch("data.json")
       .then(res => res.json())
       .then(data => {
@@ -135,11 +120,23 @@
         const lolos = data.lolos.map(n => n.toLowerCase());
         const tidakLolos = data.tidak_lolos.map(n => n.toLowerCase());
 
-        let statusPeserta = "tidak_ditemukan";
-        if (lolos.includes(namaLower)) statusPeserta = "lolos";
-        else if (tidakLolos.includes(namaLower)) statusPeserta = "tidak_lolos";
+        let finalStatus = null;
 
-        // Efek ketik
+        if (lolos.includes(namaLower)) {
+          finalStatus = "lolos";
+        } else if (tidakLolos.includes(namaLower)) {
+          finalStatus = "tidak_lolos";
+        }
+
+        if (!finalStatus) {
+          desc.textContent = "Nama peserta tidak ditemukan.";
+          return;
+        }
+
+        setTimeout(() => {
+          document.getElementById("nama").classList.add("show");
+        }, 500);
+
         setTimeout(() => {
           let i = 0;
           const interval = setInterval(() => {
@@ -158,25 +155,24 @@
                 setTimeout(() => {
                   clearInterval(loadingInterval);
                   loading.style.display = "none";
+                  status.classList.add("scale-in");
 
-                  if (statusPeserta === "lolos") {
-                    status.textContent = "Lolos";
-                    status.style.color = "green";
-                    status.classList.add("scale-in");
-
+                  if (finalStatus === "lolos") {
+                    status.textContent = "Tidak Lolos";
                     setTimeout(() => {
                       status.classList.add("strikethrough");
+                      result.textContent = "LOLOS 🎉";
                       result.classList.add("scale-in");
                       showConfetti();
                     }, 1500);
-                  } else if (statusPeserta === "tidak_lolos") {
-                    status.textContent = "Tidak Lolos";
-                    status.style.color = "red";
-                    status.classList.add("scale-in");
                   } else {
-                    status.textContent = "Nama tidak ditemukan";
-                    status.style.color = "orange";
-                    status.classList.add("scale-in");
+                    status.textContent = "Lolos";
+                    setTimeout(() => {
+                      status.classList.add("strikethrough");
+                      result.textContent = "TIDAK LOLOS";
+                      result.style.color = "red";
+                      result.classList.add("scale-in");
+                    }, 1500);
                   }
 
                 }, 4000);
@@ -186,5 +182,6 @@
         }, 500);
       });
   </script>
+
 </body>
 </html>
