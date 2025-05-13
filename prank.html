@@ -102,7 +102,7 @@
       document.getElementById("nama").classList.add("show");
     }, 500);
 
-    // Efek ketik kalimat deskripsi
+    // Efek ketik deskripsi
     setTimeout(() => {
       let i = 0;
       const interval = setInterval(() => {
@@ -111,7 +111,7 @@
         if (i >= kalimat.length) {
           clearInterval(interval);
 
-          // Setelah selesai mengetik, tunggu 0.5s lalu tampilkan "Memproses..."
+          // Setelah selesai mengetik, tunggu 0.5s lalu tampilkan loading
           setTimeout(() => {
             loading.classList.add("show");
             loadingInterval = setInterval(() => {
@@ -119,21 +119,21 @@
               dotsEl.textContent = ".".repeat(dotCount);
             }, 500);
 
-            // Setelah 4 detik memproses, munculkan hasil
+            // Setelah 4 detik loading
             setTimeout(() => {
               clearInterval(loadingInterval);
               loading.style.display = "none";
               status.classList.add("scale-in");
 
               if (statusPeserta === "lolos") {
+                // Ganti jeda jadi 1.5 detik sebelum coret dan tampilkan hasil lolos
                 setTimeout(() => {
                   status.classList.add("strikethrough");
                   result.classList.add("scale-in");
-                }, 2000);
+                }, 1500);
               }
 
             }, 4000);
-
           }, 500);
         }
       }, 50);
