@@ -11,7 +11,6 @@
       background: #f0f0f0;
       overflow-x: hidden;
     }
-
     h1 {
       opacity: 0;
       transform: translateX(-50px);
@@ -19,19 +18,16 @@
       font-size: 48px;
       margin-bottom: 20px;
     }
-
     .show {
       opacity: 1;
       transform: translateX(0);
     }
-
     .desc {
       font-size: 24px;
       margin-bottom: 10px;
       height: 30px;
       white-space: pre-wrap;
     }
-
     .loading {
       font-size: 20px;
       color: #555;
@@ -40,33 +36,27 @@
       transform: translateX(-50px);
       transition: all 0.8s ease;
     }
-
     .loading.show {
       opacity: 1;
       transform: translateX(0);
     }
-
     .status, .final-result {
       opacity: 0;
       transform: scale(0.8);
       transition: all 0.5s ease;
     }
-
     .scale-in {
       opacity: 1;
       transform: scale(1);
     }
-
     .status {
       font-size: 36px;
       color: red;
     }
-
     .strikethrough {
       text-decoration: line-through;
       opacity: 0.6;
     }
-
     .final-result {
       font-size: 48px;
       color: green;
@@ -82,6 +72,7 @@
   <div class="status" id="status">Tidak Lolos</div>
   <div class="final-result" id="result">LOLOS 🎉</div>
 
+  <!-- Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
@@ -104,8 +95,18 @@
       const end = Date.now() + duration;
 
       (function frame() {
-        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
 
         if (Date.now() < end) {
           requestAnimationFrame(frame);
@@ -113,72 +114,74 @@
       })();
     }
 
+    function ketikKalimat(teks, targetEl, callback) {
+      let i = 0;
+      const interval = setInterval(() => {
+        targetEl.textContent += teks[i];
+        i++;
+        if (i >= teks.length) {
+          clearInterval(interval);
+          if (callback) callback();
+        }
+      }, 50);
+    }
+
+    // Ambil data dari data.json
     fetch("data.json")
       .then(res => res.json())
       .then(data => {
         const namaLower = namaPeserta.toLowerCase();
         const lolos = data.lolos.map(n => n.toLowerCase());
         const tidakLolos = data.tidak_lolos.map(n => n.toLowerCase());
+        const isLolos = lolos.includes(namaLower);
+        const isTidakLolos = tidakLolos.includes(namaLower);
 
-        let finalStatus = null;
-
-        if (lolos.includes(namaLower)) {
-          finalStatus = "lolos";
-        } else if (tidakLolos.includes(namaLower)) {
-          finalStatus = "tidak_lolos";
-        }
-
-        if (!finalStatus) {
-          desc.textContent = "Nama peserta tidak ditemukan.";
+        if (!isLolos && !isTidakLolos) {
+          desc.textContent = "";
+          loading.style.display = "none";
+          status.style.display = "none";
+          result.style.display = "none";
+          document.getElementById("nama").textContent = `Peserta dengan nama "${namaPeserta}" tidak ditemukan.`;
           return;
         }
 
+        // Tampilkan nama
         setTimeout(() => {
           document.getElementById("nama").classList.add("show");
         }, 500);
 
+        // Efek ketik deskripsi
         setTimeout(() => {
-          let i = 0;
-          const interval = setInterval(() => {
-            desc.textContent += kalimat[i];
-            i++;
-            if (i >= kalimat.length) {
-              clearInterval(interval);
+          ketikKalimat(kalimat, desc, () => {
+            setTimeout(() => {
+              loading.classList.add("show");
+              loadingInterval = setInterval(() => {
+                dotCount = (dotCount % 3) + 1;
+                dotsEl.textContent = ".".repeat(dotCount);
+              }, 500);
 
               setTimeout(() => {
-                loading.classList.add("show");
-                loadingInterval = setInterval(() => {
-                  dotCount = (dotCount % 3) + 1;
-                  dotsEl.textContent = ".".repeat(dotCount);
-                }, 500);
+                clearInterval(loadingInterval);
+                loading.style.display = "none";
 
-                setTimeout(() => {
-                  clearInterval(loadingInterval);
-                  loading.style.display = "none";
+                if (isLolos) {
+                  // Prank dulu
                   status.classList.add("scale-in");
 
-                  if (finalStatus === "lolos") {
-                    status.textContent = "Tidak Lolos";
-                    setTimeout(() => {
-                      status.classList.add("strikethrough");
-                      result.textContent = "LOLOS 🎉";
-                      result.classList.add("scale-in");
-                      showConfetti();
-                    }, 1500);
-                  } else {
-                    status.textContent = "Lolos";
-                    setTimeout(() => {
-                      status.classList.add("strikethrough");
-                      result.textContent = "TIDAK LOLOS";
-                      result.style.color = "red";
-                      result.classList.add("scale-in");
-                    }, 1500);
-                  }
+                  setTimeout(() => {
+                    status.classList.add("strikethrough");
+                    result.classList.add("scale-in");
+                    showConfetti();
+                  }, 1500);
+                } else {
+                  // Tidak Lolos beneran, tanpa prank
+                  status.textContent = "Tidak Lolos";
+                  status.classList.add("scale-in");
+                }
 
-                }, 4000);
-              }, 500);
-            }
-          }, 50);
+              }, 4000);
+            }, 500);
+          });
         }, 500);
       });
   </script>
