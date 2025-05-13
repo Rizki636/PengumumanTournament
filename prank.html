@@ -97,10 +97,12 @@
     let dotCount = 1;
     let loadingInterval;
 
+    // Tampilkan nama
     setTimeout(() => {
       document.getElementById("nama").classList.add("show");
     }, 500);
 
+    // Efek ketik deskripsi dan loading
     setTimeout(() => {
       let i = 0;
       const interval = setInterval(() => {
@@ -108,29 +110,34 @@
         i++;
         if (i >= kalimat.length) {
           clearInterval(interval);
+
+          // Tampilkan "Memproses..." setelah selesai ketik
           setTimeout(() => {
             loading.classList.add("show");
             loadingInterval = setInterval(() => {
               dotCount = (dotCount % 3) + 1;
               dotsEl.textContent = ".".repeat(dotCount);
             }, 500);
-          }, 500);
+
+            // Setelah 4 detik, tampilkan hasil
+            setTimeout(() => {
+              clearInterval(loadingInterval);
+              loading.style.display = "none";
+              status.classList.add("scale-in");
+
+              if (statusPeserta === "lolos") {
+                setTimeout(() => {
+                  status.classList.add("strikethrough");
+                  result.classList.add("scale-in");
+                }, 2000);
+              }
+
+            }, 4000); // durasi loading
+
+          }, 500); // jeda setelah ketik
         }
       }, 50);
-    }, 1400);
-
-    setTimeout(() => {
-      clearInterval(loadingInterval);
-      loading.style.display = "none";
-      status.classList.add("scale-in");
-    }, 6400);
-
-    setTimeout(() => {
-      if (statusPeserta === "lolos") {
-        status.classList.add("strikethrough");
-        result.classList.add("scale-in");
-      }
-    }, 8800);
+    }, 500);
   </script>
 
 </body>
