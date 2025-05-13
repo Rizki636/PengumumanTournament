@@ -2,119 +2,45 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Cek Kelulusan Tournament</title>
+  <title>Cek Status Tournament</title>
   <style>
     body {
       font-family: sans-serif;
-      text-align: center;
-      padding-top: 50px;
       background: #f0f0f0;
+      text-align: center;
+      padding-top: 150px;
     }
 
-    input, button {
-      font-size: 18px;
+    input {
       padding: 10px;
-      margin: 10px;
+      font-size: 18px;
+      width: 300px;
     }
 
-    .desc, .loading, .status, .final-result {
-      transition: all 0.8s ease;
-      opacity: 0;
-      transform: scale(0.9);
-      margin-top: 20px;
-    }
-
-    .show {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .status {
-      font-size: 32px;
-      color: red;
-    }
-
-    .strikethrough {
-      text-decoration: line-through;
-      opacity: 0.5;
-    }
-
-    .final-result {
-      font-size: 40px;
-      color: green;
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin-top: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-  <h1>Cek Kelulusan Tournament</h1>
-  <input type="text" id="inputNama" placeholder="Masukkan nama Anda">
+  <h1>Cek Status Tournament</h1>
+  <p>Masukkan Nama Anda:</p>
+  <input type="text" id="namaInput" placeholder="Contoh: Rizki">
+  <br>
   <button onclick="cekNama()">Cek Status</button>
 
-  <div class="desc" id="desc">Berdasarkan hasil seleksi, Anda dinyatakan:</div>
-  <div class="loading" id="loading">Memproses<span id="dots">.</span></div>
-  <div class="status" id="status">Tidak Lolos</div>
-  <div class="final-result" id="result">LOLOS 🎉</div>
-
   <script>
-    let dataPeserta = [];
-
-    // Ambil data dari peserta.json
-    fetch('peserta.json')
-      .then(response => response.json())
-      .then(data => {
-        dataPeserta = data;
-      });
-
     function cekNama() {
-      const namaInput = document.getElementById('inputNama').value.trim().toLowerCase();
-      const peserta = dataPeserta.find(p => p.Nama.toLowerCase() === namaInput);
-
-      const desc = document.getElementById('desc');
-      const loading = document.getElementById('loading');
-      const status = document.getElementById('status');
-      const result = document.getElementById('result');
-      const dots = document.getElementById('dots');
-
-      desc.classList.remove("show");
-      loading.classList.remove("show");
-      status.classList.remove("show", "strikethrough");
-      result.classList.remove("show");
-
-      if (!peserta) {
-        alert("Nama tidak ditemukan.");
-        return;
+      const nama = document.getElementById("namaInput").value.trim();
+      if (nama) {
+        // Arahkan ke hasil.html dengan query string nama
+        window.location.href = `hasil.html?nama=${encodeURIComponent(nama)}`;
+      } else {
+        alert("Nama tidak boleh kosong!");
       }
-
-      desc.classList.add("show");
-
-      // Loading animasi
-      setTimeout(() => {
-        loading.classList.add("show");
-        let dotCount = 1;
-        const dotInterval = setInterval(() => {
-          dotCount = (dotCount % 3) + 1;
-          dots.textContent = ".".repeat(dotCount);
-        }, 500);
-
-        // Tampilkan hasil setelah 4 detik
-        setTimeout(() => {
-          clearInterval(dotInterval);
-          loading.classList.remove("show");
-
-          if (peserta.Status.toLowerCase() === "lolos") {
-            result.classList.add("show");
-          } else {
-            status.classList.add("show");
-
-            // Tambahkan efek "ngeprank" seperti coret
-            setTimeout(() => {
-              status.classList.add("strikethrough");
-              result.classList.add("show");
-            }, 2000);
-          }
-        }, 4000);
-      }, 1000);
     }
   </script>
 </body>
