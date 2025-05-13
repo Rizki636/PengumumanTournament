@@ -28,8 +28,9 @@
     .desc {
       font-size: 24px;
       margin-bottom: 10px;
-      height: 30px;
+      height: auto;
       white-space: pre-wrap;
+      min-height: 30px;
     }
 
     .loading {
@@ -81,14 +82,15 @@
   <div class="loading" id="loading">Memproses<span id="dots">.</span></div>
   <div class="status" id="status">Tidak Lolos</div>
   <div class="final-result" id="result">LOLOS 🎉</div>
+  <!-- ✅ Tambahan elemen untuk kalimat akhir -->
+  <div class="desc" id="pesan-tambahan"></div>
 
-  <!-- Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const namaPeserta = params.get("nama") || "Peserta";
-    const statusPeserta = params.get("status"); // 'lolos' atau 'tidak_lolos'
+    const statusPeserta = params.get("status");
     document.getElementById("nama").textContent = `Halo, ${namaPeserta}!`;
 
     const desc = document.getElementById("desc");
@@ -96,6 +98,7 @@
     const status = document.getElementById("status");
     const result = document.getElementById("result");
     const dotsEl = document.getElementById("dots");
+    const pesanTambahan = document.getElementById("pesan-tambahan"); // ✅ Tambahan
 
     const kalimat = "Berdasarkan hasil seleksi, Anda dinyatakan:";
     let dotCount = 1;
@@ -130,7 +133,7 @@
       document.getElementById("nama").classList.add("show");
     }, 500);
 
-    // Efek ketik deskripsi
+    // Efek ketik deskripsi awal
     setTimeout(() => {
       let i = 0;
       const interval = setInterval(() => {
@@ -153,14 +156,30 @@
               loading.style.display = "none";
               status.classList.add("scale-in");
 
+              // ✅ Kalimat tambahan berdasarkan status
+              let kalimatTambahan = "";
               if (statusPeserta === "lolos") {
-                // Tampilkan LOLOS setelah 1.5 detik dengan confetti
+                kalimatTambahan = "Selamat! Kamu lolos seleksi di tournament mlbb 2 VS 2";
                 setTimeout(() => {
                   status.classList.add("strikethrough");
                   result.classList.add("scale-in");
                   showConfetti();
                 }, 1500);
+              } else {
+                kalimatTambahan = "Mohon maaf, kamu tidak lolos seleksi di tournament mlbb 2 VS 2";
               }
+
+              // ✅ Efek ketik kalimat tambahan
+              let j = 0;
+              setTimeout(() => {
+                const intervalTambahan = setInterval(() => {
+                  pesanTambahan.textContent += kalimatTambahan[j];
+                  j++;
+                  if (j >= kalimatTambahan.length) {
+                    clearInterval(intervalTambahan);
+                  }
+                }, 40);
+              }, 500); // Muncul 0.5s setelah status
 
             }, 4000);
           }, 500);
@@ -168,6 +187,5 @@
       }, 50);
     }, 500);
   </script>
-
 </body>
 </html>
