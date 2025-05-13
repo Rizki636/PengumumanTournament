@@ -2,45 +2,20 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Cek Status Tournament</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f0f0f0;
-      text-align: center;
-      padding-top: 150px;
-    }
-
-    input {
-      padding: 10px;
-      font-size: 18px;
-      width: 300px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-  </style>
+  <title>Cek Kelulusan Turnamen</title>
 </head>
-<body>
-  <h1>Cek Status Tournament</h1>
-  <p>Masukkan Nama Anda:</p>
-  <input type="text" id="namaInput" placeholder="Contoh: Rizki">
-  <br>
-  <button onclick="cekNama()">Cek Status</button>
+<body style="text-align:center; padding-top:100px;">
+  <h1>Masukkan Nama Anda</h1>
+  <form onsubmit="goToResult(event)">
+    <input type="text" id="nama" required placeholder="Contoh: Rizki" />
+    <button type="submit">Cek</button>
+  </form>
 
   <script>
-    function cekNama() {
-      const nama = document.getElementById("namaInput").value.trim();
-      if (nama) {
-        // Arahkan ke hasil.html dengan query string nama
-        window.location.href = `hasil.html?nama=${encodeURIComponent(nama)}`;
-      } else {
-        alert("Nama tidak boleh kosong!");
-      }
+    function goToResult(event) {
+      event.preventDefault();
+      const nama = document.getElementById("nama").value.trim();
+      window.location.href = `hasil.html?nama=${encodeURIComponent(nama)}`;
     }
   </script>
 </body>
