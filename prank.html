@@ -59,7 +59,6 @@
 
     .status {
       font-size: 36px;
-      color: red;
     }
 
     .strikethrough {
@@ -79,16 +78,14 @@
   <h1 id="nama">Halo, Peserta!</h1>
   <div class="desc" id="desc"></div>
   <div class="loading" id="loading">Memproses<span id="dots">.</span></div>
-  <div class="status" id="status">Tidak Lolos</div>
+  <div class="status" id="status"></div>
   <div class="final-result" id="result">LOLOS 🎉</div>
 
-  <!-- Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const namaPeserta = params.get("nama") || "Peserta";
-    const statusPeserta = params.get("status"); // 'lolos' atau 'tidak_lolos'
     document.getElementById("nama").textContent = `Halo, ${namaPeserta}!`;
 
     const desc = document.getElementById("desc");
@@ -125,49 +122,69 @@
       })();
     }
 
-    // Tampilkan nama
+    // Animasi nama peserta
     setTimeout(() => {
       document.getElementById("nama").classList.add("show");
     }, 500);
 
-    // Efek ketik deskripsi
-    setTimeout(() => {
-      let i = 0;
-      const interval = setInterval(() => {
-        desc.textContent += kalimat[i];
-        i++;
-        if (i >= kalimat.length) {
-          clearInterval(interval);
+    // Ambil dan validasi dari data.json
+    fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        const namaLower = namaPeserta.toLowerCase();
+        const lolos = data.lolos.map(n => n.toLowerCase());
+        const tidakLolos = data.tidak_lolos.map(n => n.toLowerCase());
 
-          // Setelah selesai mengetik, tunggu 0.5s lalu tampilkan loading
-          setTimeout(() => {
-            loading.classList.add("show");
-            loadingInterval = setInterval(() => {
-              dotCount = (dotCount % 3) + 1;
-              dotsEl.textContent = ".".repeat(dotCount);
-            }, 500);
+        let statusPeserta = "tidak_ditemukan";
+        if (lolos.includes(namaLower)) statusPeserta = "lolos";
+        else if (tidakLolos.includes(namaLower)) statusPeserta = "tidak_lolos";
 
-            // Setelah 4 detik loading
-            setTimeout(() => {
-              clearInterval(loadingInterval);
-              loading.style.display = "none";
-              status.classList.add("scale-in");
+        // Efek ketik
+        setTimeout(() => {
+          let i = 0;
+          const interval = setInterval(() => {
+            desc.textContent += kalimat[i];
+            i++;
+            if (i >= kalimat.length) {
+              clearInterval(interval);
 
-              if (statusPeserta === "lolos") {
-                // Tampilkan LOLOS setelah 1.5 detik dengan confetti
+              setTimeout(() => {
+                loading.classList.add("show");
+                loadingInterval = setInterval(() => {
+                  dotCount = (dotCount % 3) + 1;
+                  dotsEl.textContent = ".".repeat(dotCount);
+                }, 500);
+
                 setTimeout(() => {
-                  status.classList.add("strikethrough");
-                  result.classList.add("scale-in");
-                  showConfetti();
-                }, 1500);
-              }
+                  clearInterval(loadingInterval);
+                  loading.style.display = "none";
 
-            }, 4000);
-          }, 500);
-        }
-      }, 50);
-    }, 500);
+                  if (statusPeserta === "lolos") {
+                    status.textContent = "Lolos";
+                    status.style.color = "green";
+                    status.classList.add("scale-in");
+
+                    setTimeout(() => {
+                      status.classList.add("strikethrough");
+                      result.classList.add("scale-in");
+                      showConfetti();
+                    }, 1500);
+                  } else if (statusPeserta === "tidak_lolos") {
+                    status.textContent = "Tidak Lolos";
+                    status.style.color = "red";
+                    status.classList.add("scale-in");
+                  } else {
+                    status.textContent = "Nama tidak ditemukan";
+                    status.style.color = "orange";
+                    status.classList.add("scale-in");
+                  }
+
+                }, 4000);
+              }, 500);
+            }
+          }, 50);
+        }, 500);
+      });
   </script>
-
 </body>
 </html>
